@@ -1,6 +1,6 @@
 // Backbone Model
-var server_address = 'http://127.0.0.1:8000/api/allcandidates/';
-var get_address = 'http://127.0.0.1:8000/api/allcandidates/';
+var server_address = '/api/allcandidates/';
+
 var Candidate = Backbone.Model.extend({
 	url: server_address,			// url of the server here
 	defaults: {
@@ -14,7 +14,7 @@ var Candidate = Backbone.Model.extend({
 // Backbone Collection
 
 var Candidates = Backbone.Collection.extend({
-		url : 'http://127.0.0.1:8000/api/allcandidates/'
+		url : server_address
 	});
 
 // instantiate a Collection
