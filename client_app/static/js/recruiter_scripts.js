@@ -1,5 +1,5 @@
 // Backbone Model
-var server_address = 'http://127.0.0.1:8000/api/allrecruiters/';
+var server_address = '/api/allrecruiters/';
 
 var Recruiter = Backbone.Model.extend({
 	url: server_address,			// url of the server here
