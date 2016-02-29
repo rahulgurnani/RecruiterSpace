@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="{% static 'includes/bootstrap/dist/css/bootstrap.css' %}">
+	<meta charset="UTF-8">
+	<title>Candidates</title>
+</head>
+<body>
+	<div class="container">
+		<h1>Candidates</h1>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Candidate Name</th>
+					<th>College</th>
+					<th>Email Id</th>
+					<th>Recruiter</th>
+					<th>Action</th>
+				</tr>
+				<tr>
+					<td><input class="form-control name-input"></td>
+					<td><input class="form-control college-input"></td>
+					<td><input class="form-control emailid-input"></td>
+					<td><input class="form-control recruiter-input"></td>
+					<td><button class="btn btn-primary add-candidate">Add</button></td>
+				</tr>
+			</thead>
+			<tbody class="candidates-list"></tbody>
+		</table>
+	</div>
+
+	<script type="text/template" class="candidates-list-template">
+	<td><span class="name"><%= name %></span></td>
+	<td><span class="college"><%= college %></span></td>
+	<td><span class="emailid"><%= emailid %></span></td>
+	<td><span class="recruiter"><%= recruiter %></span></td>
+	<td><button class="btn btn-warning edit-candidate">Edit</button> <button class="btn btn-danger delete-candidate">Delete</button><button class="btn btn-success update-candidate" style="display:none">Update</button> <button class="btn btn-danger cancel" style="display:none">Cancel</button></td>
+
+	</script>
+	
+	<script src="{% static 'includes/jquery/dist/jquery.js' %}"></script>
+	<script src="{% static 'includes/underscore/underscore.js' %}"></script>
+	<script src="{% static 'includes/backbone/backbone.js' %}"></script>
+	<script src="{% static 'js/candidate_scripts.js' %}"></script>
+</body>
+</html>
