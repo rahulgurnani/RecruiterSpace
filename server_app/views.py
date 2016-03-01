@@ -46,13 +46,16 @@ def candidate_detail(request, pk, format = None):
         candidate = Candidate.objects.get(pk=pk)
     except Candidate.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
+    #when we receive a get request
     if request.method == 'GET':
         serializer = CandidateSerializer(candidate)
         return Response(serializer.data)
     elif request.method == 'PUT':
         serializer = CandidateSerializer(candidate, data=request.data)
         if serializer.is_valid():
+            recruiter = serializer.validated_data['recruiter']
+            if len(Recruiter.objects.filter(name=recruiter))==0:
+                return Response("recruiter not present", status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

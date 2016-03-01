@@ -55,15 +55,21 @@ var RecruiterView = Backbone.View.extend({
 		this.model.set('name', $('.name-update').val());
 		this.model.set('company', $('.company-update').val());
 		this.model.set('emailid', $('.emailid-update').val());
-		
-		this.model.save(null, { 
-			success: function(response) {
-			console.log('successfully updated');
-		},
-		error: function(response) {
-			console.log('error in update');
-		} }
-		) ;
+		var my_data = this.model.toJSON();
+		$.ajax({
+  		type: "PUT",
+  		url: server_address+my_data.id,
+  		data: my_data,
+  		success: function(msg){
+        	console.log( "Data updated: " + msg );
+  		},
+  		error: function(XMLHttpRequest, textStatus, errorThrown) {
+     	alert("some error" );
+     	console.log(XMLHttpRequest)
+     	console.log(textStatus);
+     	console.log(errorThrown);
+  		}
+		});
 	},
 	cancel: function() {
 		recruitersView.render();
@@ -112,10 +118,6 @@ var RecruitersView = Backbone.View.extend({
 				console.log("failed to get");
 			}
 		})
-		//console.log(res);
-		/*candidates.fetch({url: get_address, success: function(data_array) {
-			console.log(data_array)	;
-		}});*/
 	},
 	render: function() {
 		var self = this;
@@ -136,20 +138,19 @@ $(document).ready(function() {
 			company: $('.company-input').val(),
 			emailid: $('.emailid-input').val(),
 		});
-		//console.log(" -- addded --");
-		$.post( server_address, 
-			recruiter.toJSON(),
-			function( data ) {
-  			console.log("returned");
-  			$( ".result" ).html( data ); 
-  		});
-		//candidate.fetch({url:server_address, type:'POST'});
+		
+		recruiter.save(null, {
+			success: function(response) {
+				console.log('successfully saved id = ' + response.toJSON().id);
+				recruiters.add(recruiter);
+			},
+			error: function() {
+				alert("hi, some error");
+			}
+		})
 		$('.name-input').val('');
 		$('.company-input').val('');
 		$('.emailid-input').val('');
 		$('.recruiter-input').val('');
-		console.log(recruiter.toJSON());
-		recruiters.add(recruiter);
-		alert("successfully added");
 	})
 })

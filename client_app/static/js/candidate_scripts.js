@@ -1,6 +1,7 @@
 // Backbone Model
 var server_address = '/api/allcandidates/';
 
+// Candidate model defined
 var Candidate = Backbone.Model.extend({
 	url: server_address,			// url of the server here
 	defaults: {
@@ -8,34 +9,25 @@ var Candidate = Backbone.Model.extend({
 		college: '',
 		emailid: '',
 		recruiter:''
-	}
+	},
+	idAttribute: "id"
 });
 
-// Backbone Collection
+// Backbone Collection, Candidates collection defined
 
 var Candidates = Backbone.Collection.extend({
 		url : server_address
 	});
 
 // instantiate a Collection
-
 var candidates = new Candidates();
 
-var candidate1 = new Candidate({
-		name: "Rahul",
-		college: "IIT Kgp",
-		emailid: "21",
-		recruiter: "hr"
-});
-
 // Backbone View for one candidate
-
 var CandidateView = Backbone.View.extend({
 	model: new Candidate(),
 	tagName: 'tr',
 	initialize: function() {
 		this.template = _.template($('.candidates-list-template').html());
-
 	},
 	events: {
 		'click .edit-candidate': 'edit',
@@ -61,18 +53,31 @@ var CandidateView = Backbone.View.extend({
 	},
 	update: function() {
 		console.log('update function called');
-		this.model.set('name', $('.name-update').val());
-		this.model.set('college', $('.college-update').val());
-		this.model.set('emailid', $('.emailid-update').val());
-		this.model.set('recruiter', $('.recruiter-update').val());
-		this.model.save(null, { 
-			success: function(response) {
-			console.log('successfully updated');
-		},
-		error: function(response) {
-			console.log('error in update');
-		} }
-		) ;
+		var self = this;
+		var my_data = {
+						id: this.model.toJSON().id,
+						name: $('.name-update').val(),
+						college: $('.college-update').val(),
+						emailid: $('.emailid-update').val(),
+						recruiter: $('.recruiter-update').val(),
+					};
+		$.ajax({
+  		type: "PUT",
+  		url: server_address+my_data.id,
+  		data: my_data,
+  		success: function(msg){
+        	console.log( "Data updated: " + msg );
+        	self.model.set(my_data);
+
+  		},
+  		error: function(XMLHttpRequest, textStatus, errorThrown) {
+     	alert("some error" );
+
+     	console.log(XMLHttpRequest)
+     	console.log(textStatus);
+     	console.log(errorThrown);
+  		}
+		});
 	},
 	cancel: function() {
 		candidatesView.render();
@@ -89,30 +94,30 @@ var CandidateView = Backbone.View.extend({
 
 	},
 	render: function() {
-		this.$el.html(this.template(this.model.toJSON()));
-		//console.log(this.template(this.model.toJSON()));
+		this.$el.html(this.template(this.model.toJSON())); // data will go into row here
 		return this;
 	}
 });
 
-// Backbone View for all candidates
 
+// Backbone View for all candidates
 var CandidatesView = Backbone.View.extend({
 	model: candidates,
 	el: $('.candidates-list'),
 	initialize: function() {
 		var self = this;
-		this.model.on('add', this.render, this);
-		/*this.model.on('change', function() {
+		this.model.on('add', this.render, this);	// every time we add a candidate we render
+		this.model.on('change', function() {		// every time there is a update of candidate
 			setTimeout(function() {
 				self.render();
 			}, 30);
-		},this);*/
+		},this);
 		this.model.on('remove', this.render, this);
+		// here we fetches all the instances of candidates
 		this.model.fetch({
 			success: function(response) {
 				_.each(response.toJSON(), function(item) {
-					console.log('successfully got '+item);
+					console.log('successfully got candidate id '+item.id);
 				})
 			},
 			error: function() {
@@ -133,6 +138,7 @@ var CandidatesView = Backbone.View.extend({
 var candidatesView = new CandidatesView();
 
 $(document).ready(function() {
+	// on clicking add candidate the following function will be executed
 	$('.add-candidate').on('click', function() {
 		var candidate = new Candidate({
 			name: $('.name-input').val(),
@@ -140,28 +146,18 @@ $(document).ready(function() {
 			emailid: $('.emailid-input').val(),
 			recruiter: $('.recruiter-input').val()
 		});
-		/*$.post( server_address, 
-			candidate.toJSON(),
-			function( data ) {
-  			console.log("returned");
-  			$( ".result" ).html( data ); 
-  		});*/
-  		$.ajax({
-  		type: "POST",
-  		url: server_address,
-  		data: candidate.toJSON(),
-  		success: function(msg){
-        	console.log( "Data Saved: " + msg );
-  			candidates.add(candidate);
-  		},
-  		error: function(XMLHttpRequest, textStatus, errorThrown) {
-     	alert("some error" );
-     	console.log(XMLHttpRequest)
-     	console.log(textStatus);
-     	console.log(errorThrown);
-  		}
+  		
+		candidate.save(null, {
+			success: function(response) {
+				console.log('successfully saved id = ' + response.toJSON().id);
+				//candidate = new Candidate(response.toJSON());
+				candidates.add(candidate);
+			},
+			error: function() {
+				alert("hi, some error");
+			}
 		});
-		//candidate.fetch({url:server_address, type:'POST'});
+		// resetting the input fields to blank again
 		$('.name-input').val('');
 		$('.college-input').val('');
 		$('.emailid-input').val('');
